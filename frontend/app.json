@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "MedLens",
+    "slug": "medlens-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/MedLens_Logo.png",
+    "splash": {
+      "image": "./assets/MedLens.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#5A3E85"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.medlens.app",
+      "icon": "./assets/MedLens_Logo.png"
+    },
+    "android": {
+      "package": "com.medlens.app",
+      "icon": "./assets/MedLens_Logo.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/MedLens_Logo.png",
+        "backgroundColor": "#5A3E85"
+      }
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-image-picker"
+    ]
+  }
+}

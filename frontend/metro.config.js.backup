@@ -1,0 +1,21 @@
+const { getDefaultConfig } = require('expo/metro-config');
+
+const config = getDefaultConfig(__dirname);
+
+// Reduce file watching to avoid EMFILE errors
+config.watchFolders = [];
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
+
+// Disable file watching to prevent EMFILE errors
+config.watcher = {
+  additionalExts: [],
+  ignorePattern: /.*/,
+  watchman: {
+    deferStates: ['hg.update'],
+  },
+};
+
+// Reduce the number of files being watched
+config.resolver.sourceExts = ['js', 'jsx', 'json', 'ts', 'tsx'];
+
+module.exports = config;
