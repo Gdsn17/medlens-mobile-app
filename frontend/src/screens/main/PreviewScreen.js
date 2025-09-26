@@ -3,14 +3,13 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, Dimensions } fr
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '../../components/SimpleIcons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Button } from 'react-native-paper';
 
 const { width, height } = Dimensions.get('window');
 
 export default function PreviewScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { imageUri } = route.params;
+  const imageUri = route?.params?.imageUri;
   const [croppedText, setCroppedText] = useState('');
 
   const mockCropQuestion = "What specific part of this image would you like me to analyze?";
@@ -43,6 +42,23 @@ export default function PreviewScreen() {
   const goBack = () => {
     navigation.goBack();
   };
+
+  if (!imageUri) {
+    return (
+      <LinearGradient colors={['#5A3E85', '#1E1E1E']} style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack} style={styles.headerButton}>
+            <MaterialIcons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>No Image Provided</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={styles.content}>
+          <Text style={styles.questionText}>This screen requires an image captured on native.</Text>
+        </View>
+      </LinearGradient>
+    );
+  }
 
   return (
     <LinearGradient
@@ -90,15 +106,13 @@ export default function PreviewScreen() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
+          <TouchableOpacity
             onPress={handleConfirm}
-            style={styles.confirmButton}
-            labelStyle={styles.confirmButtonText}
+            style={[styles.confirmButton, !croppedText && styles.disabledButton]}
             disabled={!croppedText}
           >
-            Confirm Analysis
-          </Button>
+            <Text style={styles.confirmButtonText}>Confirm Analysis</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </LinearGradient>
@@ -193,5 +207,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    backgroundColor: 'rgba(46, 212, 217, 0.5)',
   },
 });

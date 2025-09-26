@@ -1,15 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Linking, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '../../components/SimpleIcons';
 import { useNavigation } from '@react-navigation/native';
-import { Button, Card, Title, Paragraph } from 'react-native-paper';
 
 export default function UpgradeScreen() {
   const navigation = useNavigation();
 
   const handleUpgrade = () => {
-    // Mock upgrade process
+    if (Platform.OS === 'web') {
+      Linking.openURL('https://medlensai-waitlist.com');
+      return;
+    }
     Alert.alert(
       'Upgrade to MedLens Pro',
       'This would normally redirect to Stripe payment. For demo purposes, this is a placeholder.',
@@ -95,24 +97,21 @@ export default function UpgradeScreen() {
           </Text>
         </View>
 
-        <Card style={styles.featuresCard}>
-          <Card.Content>
-            <Title style={styles.cardTitle}>Pro Features</Title>
-            {features.map((feature, index) => (
-              <View key={index} style={styles.featureItem}>
-                <MaterialIcons name={feature.icon} size={24} color="#2ED4D9" />
-                <View style={styles.featureContent}>
-                  <Text style={styles.featureTitle}>{feature.title}</Text>
-                  <Text style={styles.featureDescription}>{feature.description}</Text>
-                </View>
+        <View style={styles.featuresCard}>
+          <Text style={styles.cardTitle}>Pro Features</Text>
+          {features.map((feature, index) => (
+            <View key={index} style={styles.featureItem}>
+              <MaterialIcons name={feature.icon} size={24} color="#2ED4D9" />
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{feature.title}</Text>
+                <Text style={styles.featureDescription}>{feature.description}</Text>
               </View>
-            ))}
-          </Card.Content>
-        </Card>
+            </View>
+          ))}
+        </View>
 
-        <Card style={styles.plansCard}>
-          <Card.Content>
-            <Title style={styles.cardTitle}>Choose Your Plan</Title>
+        <View style={styles.plansCard}>
+          <Text style={styles.cardTitle}>Choose Your Plan</Text>
             {plans.map((plan, index) => (
               <TouchableOpacity
                 key={index}
@@ -138,18 +137,15 @@ export default function UpgradeScreen() {
                 </View>
               </TouchableOpacity>
             ))}
-          </Card.Content>
-        </Card>
+        </View>
 
         <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
+          <TouchableOpacity
             onPress={handleUpgrade}
             style={styles.upgradeButton}
-            labelStyle={styles.upgradeButtonText}
           >
-            Start Free Trial
-          </Button>
+            <Text style={styles.upgradeButtonText}>Start Free Trial</Text>
+          </TouchableOpacity>
           <Text style={styles.trialText}>
             7-day free trial, then $9.99/month
           </Text>

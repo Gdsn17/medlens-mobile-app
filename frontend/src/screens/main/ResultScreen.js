@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '../../components/SimpleIcons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Button, Card, Title, Paragraph } from 'react-native-paper';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from '../../config/firebaseConfig';
 
 export default function ResultScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { imageUri, croppedText, queryId } = route.params;
+  const imageUri = route?.params?.imageUri;
+  const croppedText = route?.params?.croppedText;
+  const queryId = route?.params?.queryId;
   const [aiResponse, setAiResponse] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -74,8 +75,10 @@ export default function ResultScreen() {
       setAiResponse(randomResponse);
       setIsLoading(false);
       
-      // Decrement user tokens
-      decrementTokens();
+      // Decrement user tokens (native only)
+      if (Platform.OS !== 'web') {
+        decrementTokens();
+      }
     }, 2000);
   };
 
@@ -118,6 +121,17 @@ export default function ResultScreen() {
     );
   }
 
+  if (!imageUri) {
+    return (
+      <LinearGradient colors={['#5A3E85', '#1E1E1E']} style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <MaterialIcons name="psychology" size={64} color="#2ED4D9" />
+          <Text style={styles.loadingText}>This screen expects an image from native capture.</Text>
+        </View>
+      </LinearGradient>
+    );
+  }
+
   return (
     <LinearGradient
       colors={['#5A3E85', '#1E1E1E']}
@@ -139,52 +153,44 @@ export default function ResultScreen() {
           <Text style={styles.cropText}>Analyzing: {croppedText}</Text>
         </View>
 
-        <Card style={styles.analysisCard}>
-          <Card.Content>
-            <Title style={styles.cardTitle}>AI Analysis</Title>
-            <Paragraph style={styles.analysisText}>
-              {aiResponse.analysis}
-            </Paragraph>
-            <View style={styles.confidenceContainer}>
-              <MaterialIcons name="verified" size={16} color="#2ED4D9" />
-              <Text style={styles.confidenceText}>Confidence: {aiResponse.confidence}</Text>
+        <View style={styles.analysisCard}>
+          <Text style={styles.cardTitle}>AI Analysis</Text>
+          <Text style={styles.analysisText}>
+            {aiResponse.analysis}
+          </Text>
+          <View style={styles.confidenceContainer}>
+            <MaterialIcons name="verified" size={16} color="#2ED4D9" />
+            <Text style={styles.confidenceText}>Confidence: {aiResponse.confidence}</Text>
+          </View>
+        </View>
+
+        <View style={styles.findingsCard}>
+          <Text style={styles.cardTitle}>Key Findings</Text>
+          {aiResponse.keyFindings.map((finding, index) => (
+            <View key={index} style={styles.findingItem}>
+              <MaterialIcons name="check-circle" size={16} color="#2ED4D9" />
+              <Text style={styles.findingText}>{finding}</Text>
             </View>
-          </Card.Content>
-        </Card>
+          ))}
+        </View>
 
-        <Card style={styles.findingsCard}>
-          <Card.Content>
-            <Title style={styles.cardTitle}>Key Findings</Title>
-            {aiResponse.keyFindings.map((finding, index) => (
-              <View key={index} style={styles.findingItem}>
-                <MaterialIcons name="check-circle" size={16} color="#2ED4D9" />
-                <Text style={styles.findingText}>{finding}</Text>
-              </View>
-            ))}
-          </Card.Content>
-        </Card>
-
-        <Card style={styles.recommendationsCard}>
-          <Card.Content>
-            <Title style={styles.cardTitle}>Recommendations</Title>
-            {aiResponse.recommendations.map((recommendation, index) => (
-              <View key={index} style={styles.recommendationItem}>
-                <MaterialIcons name="arrow-forward" size={16} color="#2ED4D9" />
-                <Text style={styles.recommendationText}>{recommendation}</Text>
-              </View>
-            ))}
-          </Card.Content>
-        </Card>
+        <View style={styles.recommendationsCard}>
+          <Text style={styles.cardTitle}>Recommendations</Text>
+          {aiResponse.recommendations.map((recommendation, index) => (
+            <View key={index} style={styles.recommendationItem}>
+              <MaterialIcons name="arrow-forward" size={16} color="#2ED4D9" />
+              <Text style={styles.recommendationText}>{recommendation}</Text>
+            </View>
+          ))}
+        </View>
 
         <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
+          <TouchableOpacity
             onPress={handleNewQuery}
             style={styles.newQueryButton}
-            labelStyle={styles.buttonText}
           >
-            New Query
-          </Button>
+            <Text style={styles.buttonText}>New Query</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </LinearGradient>
@@ -255,16 +261,34 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginBottom: 16,
     borderRadius: 12,
+    padding: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   findingsCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginBottom: 16,
     borderRadius: 12,
+    padding: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   recommendationsCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginBottom: 20,
     borderRadius: 12,
+    padding: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   cardTitle: {
     color: '#2ED4D9',

@@ -22,7 +22,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.medlens.app",
-      "icon": "./assets/MedLens_Logo.png"
+      "icon": "./assets/MedLens_Logo.png",
+      "jsEngine": "jsc"
     },
     "android": {
       "package": "com.medlens.app",
@@ -30,7 +31,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/MedLens_Logo.png",
         "backgroundColor": "#5A3E85"
-      }
+      },
+      "jsEngine": "jsc"
+    },
+    "web": {
+      "favicon": "./assets/MedLens_Logo.png",
+      "jsEngine": "jsc"
     },
     "plugins": [
       "expo-camera",

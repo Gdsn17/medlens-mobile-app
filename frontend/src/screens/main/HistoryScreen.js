@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '../../components/SimpleIcons';
 import { useNavigation } from '@react-navigation/native';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import { Platform } from 'react-native';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { auth, db } from '../../config/firebaseConfig';
 
@@ -16,6 +16,11 @@ export default function HistoryScreen() {
   const categories = ['All', 'Radiology', 'Cardiology', 'Dermatology', 'Pathology', 'Other'];
 
   useEffect(() => {
+    if (Platform.OS === 'web') {
+      setQueries(getMockQueries());
+      setIsLoading(false);
+      return;
+    }
     loadQueries();
   }, []);
 
@@ -85,24 +90,22 @@ export default function HistoryScreen() {
   };
 
   const renderQueryItem = ({ item }) => (
-    <Card style={styles.queryCard}>
-      <Card.Content>
-        <View style={styles.queryHeader}>
-          <Image source={{ uri: item.image_url }} style={styles.queryImage} />
-          <View style={styles.queryInfo}>
-            <Title style={styles.queryTitle}>{item.cropped_text}</Title>
-            <Text style={styles.queryDate}>{formatDate(item.createdAt)}</Text>
-            <Text style={styles.queryCategory}>{item.category}</Text>
-          </View>
-          <TouchableOpacity style={styles.viewButton}>
-            <MaterialIcons name="arrow-forward-ios" size={16} color="#2ED4D9" />
-          </TouchableOpacity>
+    <View style={styles.queryCard}>
+      <View style={styles.queryHeader}>
+        <Image source={{ uri: item.image_url }} style={styles.queryImage} />
+        <View style={styles.queryInfo}>
+          <Text style={styles.queryTitle}>{item.cropped_text}</Text>
+          <Text style={styles.queryDate}>{formatDate(item.createdAt)}</Text>
+          <Text style={styles.queryCategory}>{item.category}</Text>
         </View>
-        <Paragraph style={styles.queryPreview} numberOfLines={2}>
-          {item.ai_response}
-        </Paragraph>
-      </Card.Content>
-    </Card>
+        <TouchableOpacity style={styles.viewButton}>
+          <MaterialIcons name="arrow-forward-ios" size={16} color="#2ED4D9" />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.queryPreview} numberOfLines={2}>
+        {item.ai_response}
+      </Text>
+    </View>
   );
 
   const renderCategoryFilter = () => (
@@ -239,6 +242,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginBottom: 12,
     borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   queryHeader: {
     flexDirection: 'row',

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Linking, I
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '../../components/SimpleIcons';
 import { useNavigation } from '@react-navigation/native';
-import { Card, Title, Paragraph, List, Divider } from 'react-native-paper';
+import { Platform } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../config/firebaseConfig';
 
@@ -21,6 +21,11 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
+              if (Platform.OS === 'web') {
+                // No-op logout on web demo
+                navigation.navigate('Home');
+                return;
+              }
               await signOut(auth);
             } catch (error) {
               console.error('Error signing out:', error);
@@ -112,42 +117,36 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Card style={styles.sectionCard}>
-          <Card.Content>
-            <Title style={styles.sectionTitle}>MedLens</Title>
-            {renderSectionItem('help-outline', 'FAQ', () => handleMedLensSection('faq'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('gift', 'Earn free questions', () => handleMedLensSection('earn'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('help', 'How to use it', () => handleMedLensSection('howto'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('privacy-tip', 'Privacy Policy', () => handleMedLensSection('privacy'))}
-          </Card.Content>
-        </Card>
+        <View style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>MedLens</Text>
+          {renderSectionItem('help-outline', 'FAQ', () => handleMedLensSection('faq'))}
+          <View style={styles.divider} />
+          {renderSectionItem('gift', 'Earn free questions', () => handleMedLensSection('earn'))}
+          <View style={styles.divider} />
+          {renderSectionItem('help', 'How to use it', () => handleMedLensSection('howto'))}
+          <View style={styles.divider} />
+          {renderSectionItem('privacy-tip', 'Privacy Policy', () => handleMedLensSection('privacy'))}
+        </View>
 
-        <Card style={styles.sectionCard}>
-          <Card.Content>
-            <Title style={styles.sectionTitle}>Community</Title>
-            {renderSectionItem('star', 'Rate MedLens in App Store', () => handleCommunitySection('rate'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('chat', 'Join MedLens Discord', () => handleCommunitySection('discord'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('camera-alt', 'Follow MedLens on Instagram', () => handleCommunitySection('instagram'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('music-note', 'Follow MedLens on TikTok', () => handleCommunitySection('tiktok'))}
-          </Card.Content>
-        </Card>
+        <View style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>Community</Text>
+          {renderSectionItem('star', 'Rate MedLens in App Store', () => handleCommunitySection('rate'))}
+          <View style={styles.divider} />
+          {renderSectionItem('chat', 'Join MedLens Discord', () => handleCommunitySection('discord'))}
+          <View style={styles.divider} />
+          {renderSectionItem('camera-alt', 'Follow MedLens on Instagram', () => handleCommunitySection('instagram'))}
+          <View style={styles.divider} />
+          {renderSectionItem('music-note', 'Follow MedLens on TikTok', () => handleCommunitySection('tiktok'))}
+        </View>
 
-        <Card style={styles.sectionCard}>
-          <Card.Content>
-            <Title style={styles.sectionTitle}>About</Title>
-            {renderSectionItem('email', 'Contact Us', () => handleAboutSection('contact'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('feedback', 'Give Feedback', () => handleAboutSection('feedback'))}
-            <Divider style={styles.divider} />
-            {renderSectionItem('logout', 'Logout', () => handleAboutSection('logout'))}
-          </Card.Content>
-        </Card>
+        <View style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>About</Text>
+          {renderSectionItem('email', 'Contact Us', () => handleAboutSection('contact'))}
+          <View style={styles.divider} />
+          {renderSectionItem('feedback', 'Give Feedback', () => handleAboutSection('feedback'))}
+          <View style={styles.divider} />
+          {renderSectionItem('logout', 'Logout', () => handleAboutSection('logout'))}
+        </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>MedLens v1.0.0</Text>

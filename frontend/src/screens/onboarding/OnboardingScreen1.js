@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
@@ -31,32 +31,36 @@ export default function OnboardingScreen1() {
           </Text>
         </View>
 
-        <View style={styles.previewContainer}>
-          <View style={styles.mockCard}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/200x150/2ED4D9/FFFFFF?text=Medical+Image' }}
-              style={styles.mockImage}
-            />
-            <Text style={styles.mockText}>Upload medical image</Text>
+        <View style={styles.featuresContainer}>
+          <View style={styles.featureCard}>
+            <MaterialCommunityIcons name="brain" size={32} color="#2ED4D9" />
+            <View style={styles.featureContent}>
+              <Text style={styles.featureTitle}>AI Analysis</Text>
+              <Text style={styles.featureText}>
+                Get instant AI-powered medical insights from your images
+              </Text>
+            </View>
           </View>
-          
-          <View style={styles.mockCard}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/200x150/5A3E85/FFFFFF?text=AI+Analysis' }}
-              style={styles.mockImage}
-            />
-            <Text style={styles.mockText}>Get AI insights</Text>
+
+          <View style={styles.featureCard}>
+            <MaterialCommunityIcons name="book-open-variant" size={32} color="#2ED4D9" />
+            <View style={styles.featureContent}>
+              <Text style={styles.featureTitle}>Study Mode</Text>
+              <Text style={styles.featureText}>
+                Perfect for medical students and healthcare professionals
+              </Text>
+            </View>
           </View>
         </View>
 
-        <Button
-          mode="contained"
-          onPress={handleContinue}
-          style={styles.button}
-          labelStyle={styles.buttonText}
-        >
-          Continue
-        </Button>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={handleContinue}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </LinearGradient>
   );
@@ -78,8 +82,8 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
     marginBottom: 20,
   },
   title: {
@@ -95,37 +99,57 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  previewContainer: {
+  featuresContainer: {
+    width: '100%',
+    marginBottom: 40,
+  },
+  featureCard: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 40,
-  },
-  mockCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 16,
     alignItems: 'center',
-    width: width * 0.35,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginVertical: 12,
+    padding: 20,
+    borderRadius: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  mockImage: {
-    width: 80,
-    height: 60,
-    borderRadius: 8,
-    marginBottom: 8,
+  featureContent: {
+    flex: 1,
+    marginLeft: 16,
   },
-  mockText: {
+  featureTitle: {
+    color: '#2ED4D9',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 6,
+  },
+  featureText: {
     color: '#FFFFFF',
-    fontSize: 12,
-    textAlign: 'center',
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
   },
   button: {
     backgroundColor: '#2ED4D9',
-    borderRadius: 25,
-    paddingVertical: 8,
+    paddingHorizontal: 80,
+    paddingVertical: 18,
+    borderRadius: 30,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

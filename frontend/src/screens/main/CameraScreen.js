@@ -1,8 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'react-native';
-import { Camera } from 'expo-camera';
+import { Platform } from 'react-native';
+let Camera;
+try {
+  // Avoid importing on web to prevent runtime errors
+  if (Platform.OS !== 'web') {
+    Camera = require('expo-camera').Camera;
+  }
+} catch (e) {
+  Camera = null;
+}
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons } from '../../components/SimpleIcons';
+import { MaterialIcons, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
@@ -14,6 +23,7 @@ export default function CameraScreen() {
   const [isCapturing, setIsCapturing] = useState(false);
 
   useEffect(() => {
+    if (Platform.OS === 'web') return;
     getCameraPermissions();
   }, []);
 
@@ -44,6 +54,28 @@ export default function CameraScreen() {
   const goBack = () => {
     navigation.goBack();
   };
+
+  if (Platform.OS === 'web') {
+    return (
+      <LinearGradient colors={['#5A3E85', '#1E1E1E']} style={styles.container}>
+        <View style={styles.webContainer}>
+          <View style={styles.scanArea}>
+            <MaterialCommunityIcons name="camera" size={80} color="#2ED4D9" />
+            <Text style={styles.scanText}>Camera not available on web</Text>
+            <Text style={styles.scanSubtext}>Use mobile app for full camera functionality</Text>
+          </View>
+          <View style={styles.webControls}>
+            <TouchableOpacity style={styles.webButton}>
+              <MaterialCommunityIcons name="image" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.webButton}>
+              <MaterialCommunityIcons name="keyboard" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </LinearGradient>
+    );
+  }
 
   if (hasPermission === null) {
     return (
@@ -79,40 +111,42 @@ export default function CameraScreen() {
         type={Camera.Constants.Type.back}
         ref={setCameraRef}
       >
-        <LinearGradient
-          colors={['rgba(0,0,0,0.3)', 'transparent', 'rgba(0,0,0,0.3)']}
-          style={styles.overlay}
-        >
-          <View style={styles.header}>
-            <TouchableOpacity onPress={goBack} style={styles.headerButton}>
-              <MaterialIcons name="arrow-back" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Take Picture</Text>
-            <View style={styles.placeholder} />
-          </View>
-
-          <View style={styles.bottomContainer}>
-            <View style={styles.instructionsContainer}>
-              <Text style={styles.instructionsText}>
-                Position the medical image within the frame
-              </Text>
+        {/* Scan Area Overlay */}
+        <View style={styles.scanOverlay}>
+          <View style={styles.scanArea}>
+            <View style={styles.scanFrame}>
+              <View style={[styles.corner, styles.topLeft]} />
+              <View style={[styles.corner, styles.topRight]} />
+              <View style={[styles.corner, styles.bottomLeft]} />
+              <View style={[styles.corner, styles.bottomRight]} />
             </View>
-
-            <View style={styles.captureContainer}>
-              <TouchableOpacity
-                style={[styles.captureButton, isCapturing && styles.capturingButton]}
-                onPress={takePicture}
-                disabled={isCapturing}
-              >
-                <MaterialIcons 
-                  name={isCapturing ? "hourglass-empty" : "camera-alt"} 
-                  size={32} 
-                  color="#FFFFFF" 
-                />
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.scanText}>Take a picture of a question</Text>
+            <Text style={styles.scanSubtext}>Crop the question</Text>
           </View>
-        </LinearGradient>
+        </View>
+
+        {/* Bottom Controls */}
+        <View style={styles.bottomControls}>
+          <TouchableOpacity style={styles.controlButton}>
+            <MaterialCommunityIcons name="image" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.shutterButton, isCapturing && styles.capturingButton]}
+            onPress={takePicture}
+            disabled={isCapturing}
+          >
+            <MaterialIcons 
+              name={isCapturing ? "hourglass-empty" : "camera-alt"} 
+              size={32} 
+              color="#FFFFFF" 
+            />
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.controlButton}>
+            <MaterialCommunityIcons name="keyboard" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
       </Camera>
     </View>
   );
@@ -125,58 +159,87 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
-  overlay: {
+  scanOverlay: {
     flex: 1,
-    justifyContent: 'space-between',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-  },
-  headerButton: {
-    padding: 8,
     backgroundColor: 'rgba(0,0,0,0.3)',
-    borderRadius: 20,
   },
-  headerTitle: {
+  scanArea: {
+    alignItems: 'center',
+  },
+  scanFrame: {
+    width: width * 0.8,
+    height: width * 0.6,
+    position: 'relative',
+    marginBottom: 30,
+  },
+  corner: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    borderColor: '#2ED4D9',
+    borderWidth: 3,
+  },
+  topLeft: {
+    top: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+  },
+  topRight: {
+    top: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderBottomWidth: 0,
+  },
+  bottomLeft: {
+    bottom: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderTopWidth: 0,
+  },
+  bottomRight: {
+    bottom: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+  },
+  scanText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  placeholder: {
-    width: 40,
-  },
-  bottomContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  instructionsContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  instructionsText: {
-    color: '#FFFFFF',
-    fontSize: 16,
     textAlign: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
+    marginBottom: 5,
   },
-  captureContainer: {
+  scanSubtext: {
+    color: '#2ED4D9',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  bottomControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    paddingBottom: 50,
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  captureButton: {
-    backgroundColor: '#2ED4D9',
+  controlButton: {
+    padding: 12,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  shutterButton: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 50,
     width: 80,
     height: 80,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 4,
+    borderColor: '#2ED4D9',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -184,7 +247,25 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   capturingButton: {
-    backgroundColor: 'rgba(46, 212, 217, 0.7)',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  },
+  webContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  webControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    width: '100%',
+  },
+  webButton: {
+    padding: 12,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   centerContainer: {
     flex: 1,

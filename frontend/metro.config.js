@@ -2,7 +2,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// Keep asset support
-config.resolver.assetExts = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
+// Keep asset support and ensure fonts are resolved
+config.resolver.assetExts = [...config.resolver.assetExts, 'ttf'];
 
 module.exports = config;

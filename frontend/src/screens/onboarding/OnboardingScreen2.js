@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
 export default function OnboardingScreen2() {
@@ -54,15 +53,15 @@ export default function OnboardingScreen2() {
           ))}
         </View>
 
-        <Button
-          mode="contained"
-          onPress={handleContinue}
-          style={[styles.button, !selectedOption && styles.disabledButton]}
-          labelStyle={styles.buttonText}
-          disabled={!selectedOption}
-        >
-          Continue
-        </Button>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={handleContinue}
+            style={[styles.button, !selectedOption && styles.disabledButton]}
+            disabled={!selectedOption}
+          >
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </LinearGradient>
   );
@@ -121,17 +120,28 @@ const styles = StyleSheet.create({
     color: '#2ED4D9',
     fontWeight: 'bold',
   },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
   button: {
     backgroundColor: '#2ED4D9',
-    borderRadius: 25,
-    paddingVertical: 8,
+    paddingHorizontal: 80,
+    paddingVertical: 18,
+    borderRadius: 30,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   disabledButton: {
     backgroundColor: 'rgba(46, 212, 217, 0.3)',
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

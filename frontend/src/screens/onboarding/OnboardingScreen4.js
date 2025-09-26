@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '../../config/firebaseConfig';
@@ -22,9 +21,15 @@ export default function OnboardingScreen4() {
   const handleStartLearning = async () => {
     if (selectedJourney) {
       try {
-        // Sign in anonymously for demo purposes
-        await signInAnonymously(auth);
-        // Navigation will be handled by the auth state change in App.js
+        if (Platform.OS === 'web') {
+          // On web, navigate directly to MainApp since native auth flow is disabled
+          navigation.reset({ index: 0, routes: [{ name: 'MainApp' }] });
+          return;
+        }
+        // Native: For now, skip Firebase and proceed to app to avoid runtime blockers
+        navigation.reset({ index: 0, routes: [{ name: 'MainApp' }] });
+        // If you want auth, replace the above line with:
+        // await signInAnonymously(auth);
       } catch (error) {
         console.error('Error signing in:', error);
       }
@@ -64,15 +69,15 @@ export default function OnboardingScreen4() {
           ))}
         </View>
 
-        <Button
-          mode="contained"
-          onPress={handleStartLearning}
-          style={[styles.button, !selectedJourney && styles.disabledButton]}
-          labelStyle={styles.buttonText}
-          disabled={!selectedJourney}
-        >
-          Start Learning
-        </Button>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={handleStartLearning}
+            style={[styles.button, !selectedJourney && styles.disabledButton]}
+            disabled={!selectedJourney}
+          >
+            <Text style={styles.buttonText}>Start Learning</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </LinearGradient>
   );
@@ -131,17 +136,28 @@ const styles = StyleSheet.create({
     color: '#2ED4D9',
     fontWeight: 'bold',
   },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
   button: {
     backgroundColor: '#2ED4D9',
-    borderRadius: 25,
-    paddingVertical: 8,
+    paddingHorizontal: 80,
+    paddingVertical: 18,
+    borderRadius: 30,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   disabledButton: {
     backgroundColor: 'rgba(46, 212, 217, 0.3)',
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
